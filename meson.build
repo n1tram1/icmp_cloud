@@ -10,6 +10,7 @@ cloud_sources = ['src/main.c',
                  'src/dns.c',
                  'src/ping.c',
                  'src/chunk.c',
+		 'src/juggler.c',
                 ]
 cloud = executable('cloud',
                    cloud_sources)

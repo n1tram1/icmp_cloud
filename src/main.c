@@ -15,6 +15,7 @@
 #include "dns.h"
 #include "ping.h"
 #include "chunk.h"
+#include "juggler.h"
 
 #define array_len(arr) (sizeof(arr) / sizeof((arr)[0]))
 
@@ -59,12 +60,16 @@ static int ping(const char *hostname)
 
 int main(int argc, char **argv)
 {
+	struct juggler *juggler = NULL;
+
 	if (argc < 2)
 		errx(EXIT_FAILURE, "Usage: %s <hostname ...>", argv[0]);
 
+	juggler = juggler_create();
+	if (!juggler)
+		errx(EXIT_FAILURE, "failed to create the juggler");
+
 	for (int i = 1; i < argc; i++) {
-		/* if (ping(argv[i]) < 0) */
-		/* 	warnx("ping(%s) failed", argv[i]); */
 		FILE *file = fopen(argv[i], "r");
 		if (!file)
 			errx(EXIT_FAILURE, "failed to open %s", argv[i]);
@@ -74,15 +79,16 @@ int main(int argc, char **argv)
 		while ((chk = chunkify(file, PAYLOAD_MAX)) != NULL) {
 			chk->meta.idx = idx;
 
-			printf("chk %u (%u bytes): %.*s\n", chk->meta.idx,
-			       chk->meta.size, chk->meta.size,
-			       (char *)chk->data);
+			juggler_add_chunk(juggler, chk);
+
 			free(chk);
 			idx++;
 		}
 
 		fclose(file);
 	}
+
+	juggler_destroy(&juggler);
 
 	return 0;
 }
