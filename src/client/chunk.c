@@ -12,11 +12,13 @@ ssize_t chunkify(FILE *in, struct chunk *chk)
 	chk->meta.magic = CHUNK_MAGIC;
 	chk->meta.key = 0;
 	chk->meta.idx = 0;
-	chk->meta.size = sizeof(chk->data);
+	chk->meta.file_size = 0;
 
-	if ((bytes_read = fread(chk->data, 1, chk->meta.size, in)) == 0) {
+	if ((bytes_read = fread(chk->data, 1, sizeof(chk->data), in)) == 0) {
 		return -1;
 	}
+
+	chk->meta.size = bytes_read;
 
 	return bytes_read;
 }

@@ -16,7 +16,7 @@ struct chunk_meta {
     uint64_t key;
     uint32_t idx;
     uint16_t size;
-    uint16_t padding;
+    uint64_t file_size;
 } __packed;
 
 #define CHUNK_DATA_MAX ((ICMP_PAYLOAD_MAX) - sizeof(struct chunk_meta))
