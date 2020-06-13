@@ -1,40 +1,67 @@
-/* #include <netinet/ip_icmp.h> */
-/* #include <stdio.h> */
-/* #include <sys/types.h> */
-/* #include <sys/socket.h> */
-/* #include <err.h> */
-/* #include <unistd.h> */
-/* #include <netdb.h> */
-/* #include <stdlib.h> */
-/* #include <string.h> */
-/* #include <sys/socket.h> */
-/* #include <netinet/in.h> */
-/* #include <arpa/inet.h> */
+#define _POSIX_C_SOURCE 2
+
 #include <err.h>
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "global/validate.h"
 #include "global/chunk_def.h"
+#include "juggler.h"
+
+static int send_file(const char *filepath)
+{
+	int rv = 0;
+
+	FILE *file = fopen(filepath, "r");
+	if (!file) {
+		warn("failed to open %s", filepath);
+		return -1;
+	}
+
+	if (juggler_add_file(file, filepath) < 0)
+		rv = -1;
+
+	fclose(file);
+
+	return rv;
+}
+
+static void show_usage(char **argv)
+{
+	warnx("Usage: %s [-h] [-g file]... [-s file]... [-l]", argv[0]);
+}
 
 int main(int argc, char **argv)
 {
 	/* We don't have static asserts so instead this... */
 	validate_static_asserts();
 
-	if (argc < 2)
-		errx(EXIT_FAILURE, "Usage: %s <file ...>", argv[0]);
-
-	for (int i = 1; i < argc; i++) {
-		FILE *file = fopen(argv[i], "r");
-		if (!file)
-			errx(EXIT_FAILURE, "failed to open %s", argv[i]);
-
-		juggler_add_file(file, argv[i]);
-
-		fclose(file);
+	if (argc < 2) {
+		show_usage(argv);
+		exit(EXIT_FAILURE);
 	}
+
+	while (1) {
+		int c = getopt(argc, argv, "hs:");
+		if (c == -1)
+			break;
+
+		switch (c) {
+			case 's':
+				if (send_file(optarg) < 0)
+					warn("couldn't send %s", optarg);
+				break;
+			case 'h':
+			case '?':
+				show_usage(argv);
+				break;
+		}
+	}
+
+	if (optind < argc)
+		errx(EXIT_FAILURE, "invalid option \'%s\'", argv[optind]);
 
 	return 0;
 }

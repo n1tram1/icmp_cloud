@@ -25,7 +25,7 @@ client_sources = [
 client = executable('client',
                     client_sources,
                     include_directories : inc,
-		    link_with : utils_lib)
+                    link_with : utils_lib)
 
 daemon_sources = [
   'src/daemon/main.c',
@@ -34,5 +34,5 @@ daemon_sources = [
 daemon = executable('daemon',
                     daemon_sources,
                     include_directories : inc,
-		    link_with : utils_lib)
+                    link_with : utils_lib)
 

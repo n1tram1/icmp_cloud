@@ -45,7 +45,8 @@ int juggler_add_file(FILE *file, const char *filename)
 		chk.meta.idx = idx;
 		chk.meta.key = hash;
 
-		juggler_add_chunk(&chk);
+		if (juggler_add_chunk(&chk) < 0)
+			return -1;
 
 		idx++;
 	}
