@@ -6,7 +6,7 @@
 
 #include "compiler.h"
 
-#define ICMP_RESPONSE_MAX 96
+#define ICMP_RESPONSE_MAX 1024
 #define ICMP_PAYLOAD_MAX (ICMP_RESPONSE_MAX - sizeof(struct icmphdr))
 
 #define CHUNK_MAGIC 0xCAFECACACAFEBABE

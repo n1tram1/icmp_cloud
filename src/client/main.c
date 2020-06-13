@@ -16,8 +16,7 @@ static void show_usage(char **argv)
 	warnx("Usage: %s [-h] [-g file]... [-s file]... [-l]", argv[0]);
 }
 
-
-static int send_file(const char *filepath)
+static int send_file(const char *filepath, struct host *hosts)
 {
 	int rv = 0;
 
@@ -27,7 +26,7 @@ static int send_file(const char *filepath)
 		return -1;
 	}
 
-	if (juggler_add_file(file, filepath) < 0)
+	if (juggler_add_file(file, filepath, hosts) < 0)
 		rv = -1;
 
 	fclose(file);
@@ -61,6 +60,8 @@ static int recv_file(const char *arg)
 
 int main(int argc, char **argv)
 {
+	struct host *hosts = NULL;
+
 	/* We don't have static asserts so instead this... */
 	validate_static_asserts();
 
@@ -69,32 +70,38 @@ int main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 
+	hosts = hosts_create((char *[]){
+		"epita.fr", "mirror.labkom.id", "mirror.poliwangi.ac.id",
+		"suro.ubaya.ac.id", "mirror.rise.ph", NULL });
+
 	while (1) {
 		int c = getopt(argc, argv, "hs:g:");
 		if (c == -1)
 			break;
 
 		switch (c) {
-			case 's':
-				if (send_file(optarg) < 0)
-					warn("couldn't send %s", optarg);
-				break;
-			case 'g':
-				if (recv_file(optarg) < 0)
-					warn("couldn't recv %s", optarg);
+		case 's':
+			if (send_file(optarg, hosts) < 0)
+				warn("couldn't send %s", optarg);
+			break;
+		case 'g':
+			if (recv_file(optarg) < 0)
+				warn("couldn't recv %s", optarg);
 
-				printf("received %s, saved to %s\n", optarg, optarg);
+			printf("received %s, saved to %s\n", optarg, optarg);
 
-				break;
-			case 'h':
-			case '?':
-				show_usage(argv);
-				break;
+			break;
+		case 'h':
+		case '?':
+			show_usage(argv);
+			break;
 		}
 	}
 
 	if (optind < argc)
 		errx(EXIT_FAILURE, "invalid option \'%s\'", argv[optind]);
+
+	hosts_destroy(hosts);
 
 	return 0;
 }

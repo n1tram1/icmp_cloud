@@ -11,6 +11,7 @@ inc = include_directories('src/')
 utils_sources = [
   'src/utils/dns.c',
   'src/utils/ping.c',
+  'src/utils/list.c',
 ]
 
 utils_lib = static_library('utils',
@@ -20,6 +21,7 @@ client_sources = [
   'src/client/main.c',
   'src/client/chunk.c',
   'src/client/juggler.c',
+  'src/client/host.c',
 ]
 
 client = executable('client',
