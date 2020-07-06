@@ -6,16 +6,20 @@ project('cloud', 'c',
     'b_sanitize=address',
 ])
 
+
 inc = include_directories('src/')
 
 utils_sources = [
   'src/utils/dns.c',
   'src/utils/ping.c',
   'src/utils/list.c',
+  'src/utils/pinger.c',
 ]
 
+liburing_dep = dependency('liburing', required : true)
 utils_lib = static_library('utils',
-                           utils_sources)
+                           utils_sources,
+                           dependencies : [liburing_dep])
 
 client_sources = [
   'src/client/main.c',
