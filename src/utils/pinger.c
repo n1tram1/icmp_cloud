@@ -80,3 +80,26 @@ int submitter_recv(struct submitter *sub, struct sockaddr_in *src,
 
 	return -1;
 }
+
+int submitter_get_completion(struct submitter *sub, completion_cb *cb)
+{
+	struct io_uring_cqe *cqe;
+	int ret;
+
+	ret = io_uring_wait_cqe(&sub->ring, &cqe);
+	if (ret < 0) {
+		perror("io_uring_wait_cqe");
+		return 1;
+	}
+	if (cqe->res < 0) {
+		fprintf(stderr, "Async readv failed.\n");
+		return 1;
+	}
+
+	if (cb)
+		cb(cqe);
+
+	io_uring_cqe_seen(&sub->ring, cqe);
+
+	return 0;
+}

@@ -17,23 +17,10 @@
 #include "utils/ping.h"
 #include "global/chunk_def.h"
 
-#define QD 4
-
-int get_completion_and_print(struct io_uring *ring) {
-	struct io_uring_cqe *cqe;
-	int ret = io_uring_wait_cqe(ring, &cqe);
-	if (ret < 0) {
-		perror("io_uring_wait_cqe");
-		return 1;
-	}
-	if (cqe->res < 0) {
-		fprintf(stderr, "Async readv failed.\n");
-		return 1;
-	}
-
+int print_cqe_data(const struct io_uring_cqe *cqe)
+{
 	printf("received cqe (data: %p)\n", io_uring_cqe_get_data(cqe));
 
-	io_uring_cqe_seen(ring, cqe);
 	return 0;
 }
 
@@ -57,7 +44,7 @@ static void loop(struct submitter *sub)
 			       chk.meta.idx, chk.meta.size);
 
 			submitter_send(sub, &src, &chk, sizeof(chk));
-			get_completion_and_print(&sub->ring);
+			submitter_get_completion(sub, print_cqe_data);
 		}
 	}
 }
