@@ -11,7 +11,7 @@
 #include <liburing.h>
 #include <sys/mman.h>
 
-#include "utils/pinger.h"
+#include "utils/submitter.h"
 
 #include "utils/dns.h"
 #include "utils/ping.h"

@@ -13,7 +13,7 @@ utils_sources = [
   'src/utils/dns.c',
   'src/utils/ping.c',
   'src/utils/list.c',
-  'src/utils/pinger.c',
+  'src/utils/submitter.c',
 ]
 
 liburing_dep = dependency('liburing', required : true)
