@@ -46,7 +46,7 @@ struct host *hosts_create(char **argv)
 		if (!head)
 			head = h;
 		else
-			list_insert(&head->list, &h->list);
+			list_insert(head->list.prev, &h->list);
 	}
 
 
