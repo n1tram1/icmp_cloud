@@ -21,17 +21,14 @@ typedef __loff_t loff_t;
 
 struct submitter {
   struct io_uring ring;
+  int fds[1];
 };
 
-typedef int (completion_cb)(const struct io_uring_cqe *cqe);
-
-int submitter_init(struct submitter *sub);
+int submitter_init(struct submitter *sub, int fd);
 
 int submitter_send(struct submitter *sub, const struct sockaddr_in *dest,
                    const void *payload, uint16_t payload_sz);
 int submitter_recv(struct submitter *sub, struct sockaddr_in *src,
-                   socklen_t *srclen, void *payload, uint16_t payload_sz);
-
-int submitter_get_completion(struct submitter *sub, completion_cb *cb);
+                   void *payload, uint16_t payload_sz);
 
 #endif /* !SUBMITTER_H */
